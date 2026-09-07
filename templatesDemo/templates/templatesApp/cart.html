@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if request.session.lang == 'en' %}Shopping Cart - Express Shop{% else %}Carrito - Tienda Express{% endif %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'templatesApp/css/estilos.css' %}">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+<section class="h-100 h-custom" style="background-color: #eee;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col">
+        <div class="card">
+          <div class="card-body p-4">
+
+            <div class="row">
+
+              <div class="col-lg-7">
+                <h5 class="mb-3"><a href="/" class="text-body">&larr; {% if request.session.lang == 'en' %}Continue shopping{% else %}Seguir comprando{% endif %}</a></h5>
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <p class="mb-1">{% if request.session.lang == 'en' %}Shopping cart{% else %}Carrito de compras{% endif %}</p>
+                    <p class="mb-0">{% if request.session.lang == 'en' %}You have {{ items|length }} items in your cart{% else %}Tienes {{ items|length }} artículos en tu carrito{% endif %}</p>
+                  </div>
+                  <div>
+                    <p class="mb-0"><span class="text-muted">{% if request.session.lang == 'en' %}Sort by:{% else %}Ordenar por:{% endif %}</span> <a href="#!" class="text-body">{% if request.session.lang == 'en' %}price{% else %}precio{% endif %} <i class="fas fa-angle-down mt-1"></i></a></p>
+                  </div>
+                </div>
+
+                {% if items %}
+                  {% for it in items %}
+                    <div class="card mb-3">
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                          <div class="d-flex flex-row align-items-center">
+                            <div>
+                              <!-- Se corrigió la ruta de la imagen para que cargue correctamente -->
+                              <img src="/static/{{ it.imagen }}" class="img-fluid rounded-3" alt="{{ it.nombre }}" style="width: 65px; height:65px; object-fit:cover;" onerror="this.src='https://placehold.co/65'">
+                            </div>
+                            <div class="ms-3">
+                              <h5>{{ it.nombre }}</h5>
+                              <p class="small mb-0">${{ it.precio|floatformat:2 }}</p>
+                            </div>
+                          </div>
+                          <div class="d-flex flex-row align-items-center">
+                            <div style="width: 50px;">
+                              <h5 class="fw-normal mb-0">{{ it.cantidad }}</h5>
+                            </div>
+                            <div style="width: 80px;">
+                              <h5 class="mb-0">${{ it.subtotal|floatformat:2 }}</h5>
+                            </div>
+                            
+                            <!-- SE CORRIGIÓ EL BOTÓN: Ahora tiene el enlace dinámico y un ícono visible -->
+                            <a href="{% url 'eliminar_del_carrito' slug=it.slug %}" class="text-danger ms-2" title="{% if request.session.lang == 'en' %}Remove{% else %}Eliminar{% endif %}" style="text-decoration: none; font-size: 1.2rem;">
+                              <svg xmlns="http://w3.org" width="18" height="18" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.5.5 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.5.5 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                              </svg>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="text-center py-5">
+                    <p class="text-muted fs-5">{% if request.session.lang == 'en' %}Your cart is empty.{% else %}Tu carrito está vacío.{% endif %}</p>
+                  </div>
+                {% endif %}
+
+              </div>
+              <div class="col-lg-5">
+
+                <div class="card bg-primary text-white rounded-3">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <h5 class="mb-0">{% if request.session.lang == 'en' %}Card details{% else %}Datos de pago{% endif %}</h5>
+                      <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp" class="img-fluid rounded-3" style="width: 45px;" alt="Avatar">
+                    </div>
+
+                    <p class="small mb-2">{% if request.session.lang == 'en' %}Card type{% else %}Tipo de tarjeta{% endif %}</p>
+                    <div class="mb-3">
+                      <span style="font-size:22px;">💳</span>
+                    </div>
+
+                    <form class="mt-4">
+                      <div class="form-outline form-white mb-4">
+                        <input type="text" id="typeName" class="form-control form-control-lg" placeholder="{% if request.session.lang == 'en' %}Cardholder's Name{% else %}Nombre en la tarjeta{% endif %}" />
+                      </div>
+
+                      <div class="form-outline form-white mb-4">
+                        <input type="text" id="typeText" class="form-control form-control-lg" placeholder="1234 5678 9012 3457" minlength="19" maxlength="19" />
+                      </div>
+
+                      <div class="row mb-4">
+                        <div class="col-md-6">
+                          <div class="form-outline form-white">
+                            <input type="text" id="typeExp" class="form-control form-control-lg" placeholder="MM/YYYY" size="7" minlength="7" maxlength="7" />
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-outline form-white">
+                            <input type="password" id="typeText2" class="form-control form-control-lg" placeholder="***" size="1" minlength="3" maxlength="3" />
+                          </div>
+                        </div>
+                      </div>
+
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                      <p class="mb-2">{% if request.session.lang == 'en' %}Subtotal{% else %}Subtotal{% endif %}</p>
+                      <p class="mb-2">${{ total|floatformat:2 }}</p>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                      <p class="mb-2">{% if request.session.lang == 'en' %}Shipping{% else %}Envío{% endif %}</p>
+                      <p class="mb-2">$20.00</p>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-4">
+                      <p class="mb-2">{% if request.session.lang == 'en' %}Total (Incl. taxes){% else %}Total (Incl. impuestos){% endif %}</p>
+                      <p class="mb-2">${{ total|add:20|floatformat:2 }}</p>
+                    </div>
+
+                    <button type="button" class="btn btn-info btn-block btn-lg w-100">
+                      <div class="d-flex justify-content-between">
+                        <span>${{ total|add:20|floatformat:2 }}</span>
+                        <span>{% if request.session.lang == 'en' %}Checkout{% else %}Pagar{% endif %} &rarr;</span>
+                      </div>
+                    </button>
+
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+  {% include 'templatesApp/partials/footer.html' %}
+
+</body>
+</html>

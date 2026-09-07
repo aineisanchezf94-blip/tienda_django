@@ -1,0 +1,46 @@
+{% load static %}
+<div class="col">
+  <div class="card h-100 border-0 shadow-sm rounded-4 position-relative overflow-hidden bg-white p-3 text-center transition-card" style="transition: all 0.3s ease;">
+    <div class="rounded-3 bg-light d-flex align-items-center justify-content-center p-4 mb-3 product-image-wrapper" style="height: 300px;">
+      <a href="{% url 'product_detail' slug=producto.slug %}?categoria={{ categoria }}" class="w-100 h-100 d-flex align-items-center justify-content-center">
+        {% comment %}Seleccionar imagen por slug con mapeo fijo para mac/iphone/playstation{% endcomment %}
+        {% if producto.slug == 'mac' %}
+          <img src="{% static 'templatesApp/imagenes/mac.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+        {% elif producto.slug == 'iphone' %}
+          <img src="{% static 'templatesApp/imagenes/iphone.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+        {% elif producto.slug == 'playstation' %}
+          <img src="{% static 'templatesApp/imagenes/playstation.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+        {% elif producto.slug == 'auto' %}
+          <img src="{% static 'templatesApp/imagenes/Autos.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+        {% elif producto.slug == 'pelota-de-futbol' %}
+          <img src="{% static 'templatesApp/imagenes/pelota.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+        {% elif producto.slug == 'figura-de-accion' %}
+          <img src="{% static 'templatesApp/imagenes/figura.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+        {% else %}
+            {% if producto.slug == 'pantalones' %}
+            <img src="{% static 'templatesApp/imagenes/pantalones.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+          {% elif producto.slug == 'chaqueta' %}
+            <img src="{% static 'templatesApp/imagenes/chaqueta.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+          {% elif producto.slug == 'camisa' %}
+            <img src="{% static 'templatesApp/imagenes/camisa.png' %}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+          {% elif producto.imagen %}
+            <img src="{{ producto.imagen.url }}" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+          {% else %}
+            <img src="{% static 'templatesApp/imagenes/' %}{{ producto.slug }}.jpg" class="img-fluid object-fit-contain h-100 product-zoom" alt="{{ producto.nombre|default:producto.slug }}" style="transition: transform 0.3s ease; max-height:100%; width:auto;">
+          {% endif %}
+        {% endif %}
+      </a>
+    </div>
+
+    <div class="card-body p-2 d-flex flex-column">
+      <span class="text-uppercase tracking-wider text-muted mb-1" style="font-size: 0.75rem;">{{ categoria|default:"Electrónica" }}</span>
+      <h5 class="card-title fw-bold text-dark fs-5 mb-2">{{ producto.nombre|default:producto.slug }}</h5>
+      <p class="fs-5 fw-bold text-primary mb-3">${{ producto.precio|default:"999.00"|floatformat:2 }}</p>
+      <div class="mt-auto">
+        <a href="{% url 'product_detail' slug=producto.slug %}?categoria={{ categoria }}" class="btn btn-dark w-100 rounded-pill fw-medium py-2 shadow-sm" style="font-size: 0.9rem;">
+          {% if request.session.lang == 'en' %}View Details{% else %}Ver Detalle{% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

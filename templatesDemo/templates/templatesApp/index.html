@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="{% static 'templatesApp/css/estilos.css' %}">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+
+    <div class="container my-4" style="max-width: 1300px;">
+
+        
+                <!-- NAVBAR + HERO -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm rounded-3 mb-4">
+                    <div class="container-fluid px-0">
+                        <a class="navbar-brand d-flex align-items-center" href="/">
+                            <img src="{% static 'templatesApp/imagenes/logo.png' %}" alt="logo" class="me-2 rounded-circle" style="width:46px; height:46px; object-fit:cover;" onerror="this.style.display='none'">
+                            {% if request.session.lang == 'en' %}
+                                <span class="fw-bold text-secondary">Express Shop</span>
+                            {% else %}
+                                <span class="fw-bold text-secondary">Tienda Express</span>
+                            {% endif %}
+                        </a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                                                <div class="collapse navbar-collapse" id="mainNav">
+                                                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                                                <li class="nav-item"><a class="nav-link" href="/">{% if request.session.lang == 'en' %}Home{% else %}Inicio{% endif %}</a></li>
+                                                                <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">{% if request.session.lang == 'en' %}Products{% else %}Productos{% endif %}</a></li>
+                                                        </ul>
+                                                        <form class="d-flex me-2" method="get" action="">
+                                                                <input type="text" name="q" value="{{ query }}" placeholder="{% if request.session.lang == 'en' %}Search products...{% else %}Buscar productos...{% endif %}" class="form-control form-control-sm me-2" style="min-width:180px;">
+                                                                <button class="btn btn-outline-secondary btn-sm">{% if request.session.lang == 'en' %}Search{% else %}Buscar{% endif %}</button>
+                                                        </form>
+                                                        <div class="d-flex align-items-center">
+                                                                <a href="{% url 'set_language' lang='es' %}?next={{ request.path }}" class="me-2 small">ES</a>
+                                                                <a href="{% url 'set_language' lang='en' %}?next={{ request.path }}" class="me-3 small">EN</a>
+                                                                <a href="{% url 'view_cart' %}" class="btn btn-dark text-white">
+                                                                        <i class="bi bi-cart me-1"></i>Carrito (${{ cart_total|default:0.00 }})
+                                                                </a>
+
+                                                                {% if user.is_authenticated %}
+                                                                    <div class="dropdown ms-3">
+                                                                        <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            {{ user.username }}
+                                                                        </a>
+                                                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                                                            <li><a class="dropdown-item" href="{% url 'usuarios:perfil_usuario' username=user.username %}">Perfil</a></li>
+                                                                            <li><a class="dropdown-item" href="{% url 'usuarios:logout' %}">Salir</a></li>
+                                                                        </ul>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <a href="{% url 'usuarios:login' %}?next={{ request.path }}" class="btn btn-outline-secondary ms-3">Entrar</a>
+                                                                    <a href="{% url 'usuarios:registro' %}" class="btn btn-link ms-2">Registrarse</a>
+                                                                {% endif %}
+                                                        </div>
+                                                </div>
+                    </div>
+                </nav>
+
+                <section class="hero rounded-3 mb-4 overflow-hidden" style="background: linear-gradient(90deg, rgba(79,70,229,0.95), rgba(124,58,237,0.9));">
+                    <div class="row g-0 align-items-center">
+                        <div class="col-md-7 text-white p-4 p-md-5">
+                            <h2 class="display-6 fw-bold">{% if request.session.lang == 'en' %}Beautiful products, great prices{% else %}Productos bellos, precios increíbles{% endif %}</h2>
+                            <p class="lead opacity-85">{% if request.session.lang == 'en' %}Curated items for everyday life — shop now and enjoy fast shipping.{% else %}Artículos seleccionados para la vida diaria — compra ahora y recibe rápido.{% endif %}</p>
+                            <a href="{% url 'catalogo' %}" class="btn btn-light btn-lg mt-3 shadow-sm">{% if request.session.lang == 'en' %}Browse Catalog{% else %}Ver Catálogo{% endif %}</a>
+                        </div>
+                        <div class="col-md-5 d-none d-md-block">
+                            <img src="{% static 'templatesApp/imagenes/hero.jpg' %}" alt="hero" class="img-fluid" style="height:100%; object-fit:cover; filter:contrast(0.95) brightness(0.9);" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </section>
+
+
+        <!-- CONDICIÓN A: SI EL USUARIO NO HA SELECCIONADO UNA CATEGORÍA, MUESTRA LOS BOTONES PRINCIPALES -->
+        {% if not categoria %}
+            <div class="row g-3 justify-content-center my-4">
+                <div class="col-md-4">
+                    <a href="?categoria=electronica" class="text-decoration-none">
+                        <div class="card shadow-sm border-0 text-white position-relative">
+                            <img src="{% static 'templatesApp/imagenes/electronica.jpg' %}" class="card-img" alt="Electrónica" style="height:180px; object-fit:cover;" onerror="this.src='https://placehold.co/600x400?text=Electronica'">
+                            <div class="card-img-overlay d-flex align-items-end p-0">
+                                <div class="w-100 bg-dark bg-opacity-50 py-2 text-center">
+                                    <h3 class="m-0 text-white text-uppercase">Electrónica</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="?categoria=juguetes" class="text-decoration-none">
+                        <div class="card shadow-sm border-0 text-white position-relative">
+                            <img src="{% static 'templatesApp/imagenes/juguetes.jpg' %}" class="card-img" alt="Juguetes" style="height:180px; object-fit:cover;" onerror="this.src='https://placehold.co/600x400?text=Juguetes'">
+                            <div class="card-img-overlay d-flex align-items-end p-0">
+                                <div class="w-100 bg-dark bg-opacity-50 py-2 text-center">
+                                    <h3 class="m-0 text-white text-uppercase">Juguetes</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="?categoria=ropa" class="text-decoration-none">
+                        <div class="card shadow-sm border-0 text-white position-relative">
+                            <img src="{% static 'templatesApp/imagenes/ropa.jpg' %}" class="card-img" alt="Ropa" style="height:180px; object-fit:cover;" onerror="this.src='https://placehold.co/600x400?text=Ropa'">
+                            <div class="card-img-overlay d-flex align-items-end p-0">
+                                <div class="w-100 bg-dark bg-opacity-50 py-2 text-center">
+                                    <h3 class="m-0 text-white text-uppercase">Ropa</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        <!-- CONDICIÓN B: SI EL USUARIO HIZO CLIC EN UNA CATEGORÍA, MUESTRA SUS PRODUCTOS -->
+        {% else %}
+            <!-- Título de la categoría actual -->
+            <div class="alert alert-secondary fs-3 fw-semibold text-dark text-capitalize mb-4 py-2 border-0 rounded-0 shadow-sm bg-opacity-25">
+                {{ categoria }}
+            </div>
+
+            <!-- Grilla de productos con imágenes -->
+            <div class="row row-cols-1 row-cols-md-3 g-3 justify-content-center mb-4">
+                {% for prod in productos %}
+                    {% include 'templatesApp/partials/product_card.html' with producto=prod categoria=categoria %}
+                {% endfor %}
+            </div>
+
+            <!-- BOTÓN VOLVER (Saca el parámetro de la URL y regresa al menú de inicio) -->
+            <div class="mt-4">
+                <a href="?" class="btn btn-primary fw-bold px-4 shadow-sm text-uppercase btn-volver-custom">Volver</a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+    {% include 'templatesApp/partials/footer.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
