@@ -79,12 +79,18 @@
                         <button type="submit" class="btn btn-primary btn-lg">{% if request.session.lang == 'en' %}Register{% else %}Registrar{% endif %}</button>
                       </div>
 
+                      <div class="text-center">
+                        <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-lg">
+                          {% if request.session.lang == 'en' %}Back to home{% else %}Volver al inicio{% endif %}
+                        </a>
+                      </div>
+
                     </form>
 
                   </div>
                   <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
 
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp" class="img-fluid" alt="Sample image">
+                    <img src="{% static 'templatesApp/imagenes/electronica.jpg' %}" class="img-fluid rounded-4 shadow-sm" alt="Registro" onerror="this.src='https://placehold.co/600x500?text=Registro'">
 
                   </div>
                 </div>

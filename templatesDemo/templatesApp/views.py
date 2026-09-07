@@ -2,6 +2,22 @@ from django.shortcuts import render
 from django.http import Http404
 from django.utils.text import slugify
 
+def _coincide_busqueda(nombre, descripcion, query):
+    if not query:
+        return True
+    q = query.strip().lower()
+    if not q:
+        return True
+    nombre_low = nombre.lower()
+    descripcion_low = descripcion.lower()
+    return (
+        q in nombre_low or
+        q in descripcion_low or
+        nombre_low.startswith(q) or
+        descripcion_low.startswith(q)
+    )
+
+
 def tienda_home(request):
     # Catálogo simulado usando diccionarios con slug, descripción, precio e imagen
     PRODUCTS = {
@@ -68,26 +84,23 @@ def tienda_home(request):
         'ropa': ['pantalones', 'chaqueta', 'camisa']
     }
 
-    # Soporte de búsqueda por query 'q'
     query = request.GET.get('q', '').strip()
     categoria_seleccionada = request.GET.get('categoria')
-    productos_slugs = CATALOG.get(categoria_seleccionada, [])
-
-    # Convertimos slugs a estructuras con slug y nombre para la plantilla
     productos = []
-    for slug in productos_slugs:
-        p = PRODUCTS.get(slug)
-        if p:
-            productos.append({'slug': slug, 'nombre': p['nombre'], 'precio': p.get('precio'), 'descripcion': p.get('descripcion'), 'imagen': p.get('imagen')})
-    
-    # Si hay búsqueda, filtramos todos los productos por nombre/descripcion
+
     if query:
-        productos = []
         for slug, p in PRODUCTS.items():
-            if query.lower() in p['nombre'].lower() or query.lower() in p['descripcion'].lower():
+            if categoria_seleccionada and slug not in CATALOG.get(categoria_seleccionada, []):
+                continue
+            if _coincide_busqueda(p['nombre'], p['descripcion'], query):
+                productos.append({'slug': slug, 'nombre': p['nombre'], 'precio': p.get('precio'), 'descripcion': p.get('descripcion'), 'imagen': p.get('imagen')})
+    else:
+        productos_slugs = CATALOG.get(categoria_seleccionada, [])
+        for slug in productos_slugs:
+            p = PRODUCTS.get(slug)
+            if p:
                 productos.append({'slug': slug, 'nombre': p['nombre'], 'precio': p.get('precio'), 'descripcion': p.get('descripcion'), 'imagen': p.get('imagen')})
 
-    # Obtener total del carrito desde session
     cart = request.session.get('cart', {})
     cart_total = 0.0
     for slug, qty in cart.items():
@@ -101,7 +114,6 @@ def tienda_home(request):
         'cart_total': cart_total,
         'query': query,
     }
-    # Guardamos los diccionarios para que product_detail los consulte mediante la misma fuente
     request._productos_catalog = PRODUCTS
     return render(request, 'templatesApp/index.html', contexto)
 
